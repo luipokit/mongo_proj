@@ -35,3 +35,8 @@ To build for production, run build:
 $ npm run build
 ```
 
+$ To fix cros
+
+```
+open -a Google\ Chrome --args --disable-web-security --user-data-dir
+```
