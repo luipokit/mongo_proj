@@ -31,6 +31,16 @@ const app = vertex.app(config) // initialize app with config options
 const index = require('./routes/index')
 const api = require('./routes/api')
 
+// CORS
+var cors = require('cors')
+app.use(cors())
+
+// app.use(function(req, res, next) {
+// 	res.setHeader("Access-Control-Allow-Origin", "*");
+// 	res.setHeader("Access-Control-Allow-Headers", "Accept,Content-Type,X-Requested-With,x-api-key");
+// 	next();
+// });
+
 // set routes
 app.use('/', index)
 app.use('/api', api) // sample API Routes

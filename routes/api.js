@@ -10,6 +10,9 @@ const Buddha = require('../models/Buddha')
 // http://localhost:3000/api/buddha?pageNo=1&size=10
 router.get('/buddha', (req, res) => {
 
+	// res.setHeader("Access-Control-Allow-Origin", "*");
+	// res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
 	const pageNo = parseInt(req.query.pageNo)
 	const size = parseInt(req.query.size)
 
