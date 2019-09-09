@@ -12,19 +12,50 @@ router.get('/buddha', (req, res) => {
 
 	const pageNo = parseInt(req.query.pageNo)
 	const size = parseInt(req.query.size)
-	var query = {}
-
-	const skip = query.skip = size * (pageNo - 1)
-	const limit = query.limit = size
 
 	if (pageNo < 0 || pageNo === 0) {
         response = {"error" : true,"message" : "invalid page number, should start with 1"};
         return res.json(response)
 	}
 
-	Buddha.count()
+	const skip = size * (pageNo - 1)
+	const limit = size
+
+	let idFilters;
+	let titelFilter;
+	
+	if (req.query.id != null) {
+		// idFilters = {
+		// 	id: req.query.id
+		// }
+		idFilters = {
+			id : { $regex: '.*' + req.query.id + '.*' }
+		}
+
+	} 
+	if (req.query.title != null) {
+		// titelFilter = {
+		// 	title: req.query.title
+		// }
+		titelFilter = { 
+			title : { $regex: '.*' + req.query.title + '.*' }
+		}
+	}
+
+	let totalPages = 0
+
+	Buddha.find(idFilters).find(titelFilter).count()
 		.then(totalCount => {
-			find(totalCount, limit, skip);
+			totalPages = Math.ceil(totalCount / size)
+		})
+
+	Buddha.find(idFilters).find(titelFilter).limit(limit).skip(skip).sort( {'id' : 1} )
+		.then(buddha => {
+			res.json({
+				confirmation: 'success',
+				data: buddha,
+				pages: totalPages
+			})
 		})
 		.catch(err => {
 			res.json({
@@ -32,41 +63,6 @@ router.get('/buddha', (req, res) => {
 				message: err.message,
 			})
 		})
-
-	function find(totalCount, limit, skip) {
-		Buddha.find().limit(limit).skip(skip).sort( { 'id': 1 })
-			.then(buddha => {
-				var totalPages = Math.ceil(totalCount / size)
-				res.json({
-					confirmation: 'success',
-					data: buddha,
-					pages: totalPages
-				})
-			})
-			.catch(err => {
-				res.json({
-					confirmation: 'fail',
-					message: err.message,
-				})
-			})
-	}
-
-	// Find some documents (callback)
-	// mongoOp.count({},function(err,totalCount) {
-	// 	if(err) {
-	// 	  response = {"error" : true,"message" : "Error fetching data"}
-	// 	}
-	// 	mongoOp.find({},{},query,function(err,data) {
-	// 		// Mongo command to fetch all data from collection.
-	// 		if(err) {
-	// 			response = {"error" : true,"message" : "Error fetching data"};
-	// 		} else {
-	// 			var totalPages = Math.ceil(totalCount / size)
-	// 			response = {"error" : false,"message" : data,"pages": totalPages};
-	// 		}
-	// 		res.json(response);
-	// 	});
-  	// })
 })
 
 router.get('/profile', (req, res) => {
